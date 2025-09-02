@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 interface Community {
   id: string;
@@ -98,9 +99,9 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="container-page flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto" />
           <p className="mt-4 text-gray-600">Loading admin panel...</p>
         </div>
       </div>
@@ -108,47 +109,40 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
-            <p className="mt-2 text-gray-600">Manage communities and user account roles</p>
-          </div>
-        </div>
-      </div>
+    <div className="container-page py-8">
+      <PageHeader
+        title="Admin Panel"
+        description="Manage communities and user account roles"
+      />
 
       {/* Navigation */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
-            <button
-              onClick={() => setActiveTab('communities')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'communities'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Communities
-            </button>
-            <button
-              onClick={() => setActiveTab('users')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'users'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              User Accounts
-            </button>
-          </nav>
-        </div>
+      <div className="card mb-8">
+        <nav className="flex space-x-8">
+          <button
+            onClick={() => setActiveTab('communities')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'communities'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Communities
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'users'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            User Accounts
+          </button>
+        </nav>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="py-8">
         {activeTab === 'communities' ? (
           <div>
             <div className="flex justify-between items-center mb-6">
@@ -159,7 +153,7 @@ export default function AdminPage() {
             </div>
 
             {communities.length > 0 ? (
-              <div className="bg-white shadow overflow-hidden rounded-lg">
+              <div className="card overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
@@ -233,7 +227,7 @@ export default function AdminPage() {
             </div>
 
             {users.length > 0 ? (
-              <div className="bg-white shadow overflow-hidden rounded-lg">
+              <div className="card overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
