@@ -27,6 +27,7 @@
     @apply min-h-screen antialiased text-gray-800 dark:text-gray-100;
     background: radial-gradient(1200px 600px at 10% -10%, rgba(124,58,237,0.12), rgba(124,58,237,0) 60%),
                 radial-gradient(1200px 600px at 90% 10%, rgba(99,102,241,0.12), rgba(99,102,241,0) 60%),
+                radial-gradient(1200px 600px at 50% 110%, rgba(34,197,94,0.08), rgba(34,197,94,0) 60%),
                 rgb(var(--bg));
   }
 
@@ -37,7 +38,7 @@
   .container-page { @apply container mx-auto; }
 
   .section-title {
-    @apply text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100;
+    @apply text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 font-display;
   }
 
   .navbar {
@@ -94,4 +95,17 @@
 
   .gradient-text { @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-brand-500; }
   .glass { @apply bg-white/70 dark:bg-neutral-900/60 backdrop-blur border border-white/20 dark:border-neutral-800; }
+
+  .footer {
+    @apply relative glass;
+  }
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background-image: linear-gradient(to right, theme('colors.primary.600'), theme('colors.brand.500'), theme('colors.accent.500'));
+  }
 }
