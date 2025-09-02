@@ -1,0 +1,9 @@
+{
+    "name": "Task",
+    "plural": "tasks",
+    "fields": [
+      { "name": "title", "type": "string", "required": true },
+      { "name": "description", "type": "string" },
+      { "name": "status", "type": "enum", "enum": ["TODO","DOING","DONE"], "required": true }
+    ]
+  }

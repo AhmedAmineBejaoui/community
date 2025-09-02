@@ -1,0 +1,29 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: neighborhood-mongodb
+    restart: unless-stopped
+    # Enable single-node replica set so Prisma can run transactions
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: Neighborhood
+    volumes:
+      - mongodb_data:/data/db
+      # Initialize the replica set and seed collections/indexes
+      - ./mongo-replica-init.js:/docker-entrypoint-initdb.d/01-replica-init.js:ro
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/02-init.js:ro
+
+  redis:
+    image: redis:7-alpine
+    container_name: neighborhood-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mongodb_data:
+  redis_data:

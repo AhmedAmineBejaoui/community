@@ -1,0 +1,57 @@
+{
+  "name": "neighborhood-hub",
+  "version": "1.0.0",
+  "description": "Neighborhood Community Hub - Modular Monolith with Next.js BFF and Express API",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean",
+    "db:generate": "pnpm run db:generate:seq",
+    "db:generate:seq": "pnpm --filter @neighborhood-hub/api db:generate && pnpm --filter @neighborhood-hub/web db:generate",
+    "db:push": "pnpm run db:push:seq",
+    "db:push:seq": "pnpm --filter @neighborhood-hub/api db:push -- --skip-generate && pnpm --filter @neighborhood-hub/web db:push -- --skip-generate && pnpm --filter @neighborhood-hub/api db:generate && pnpm --filter @neighborhood-hub/web db:generate",
+    "db:seed": "turbo run db:seed",
+    "db:migrate": "turbo run db:migrate",
+    "gen": "node packages/generator/index.js"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "@types/node": "^20.9.0",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.1.0",
+    "tailwindcss": "^3.4.17",
+    "turbo": "^1.10.16",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.6.0",
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.1",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.542.0",
+    "mongodb": "^6.19.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7"
+  }
+}

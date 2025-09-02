@@ -1,0 +1,147 @@
+{
+  "name": "Neighborhood Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook/chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "HTTP Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "neighborhood-chat"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate signature\nconst crypto = require('crypto');\nconst secret = $env.N8N_SIGNING_SECRET;\nconst body = JSON.stringify($input.all()[0].json);\nconst signature = $input.all()[0].headers['x-n8n-signature'];\n\nconst expectedSignature = crypto\n  .createHmac('sha256', secret)\n  .update(body)\n  .digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error('Invalid signature');\n}\n\n// Validate schema\nconst { sessionId, content, communityId, userId } = $input.all()[0].json;\n\nif (!sessionId || !content || !communityId) {\n  throw new Error('Missing required fields');\n}\n\nreturn {\n  sessionId,\n  content,\n  communityId,\n  userId\n};"
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "operation": "chat",
+        "model": "gpt-4o-mini",
+        "messages": "={{ [\n  {\n    role: 'system',\n    content: 'You are a helpful neighborhood community assistant. Help users with community-related questions, service requests, and general information. Keep responses concise and friendly.'\n  },\n  {\n    role: 'user',\n    content: $json.content\n  }\n] }}",
+        "options": {
+          "temperature": 0.2,
+          "maxTokens": 512
+        }
+      },
+      "id": "openai-chat",
+      "name": "OpenAI Chat",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.API_BASE_URL }}/integrations/n8n/chat/callback",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('Validate Input').json.sessionId }}"
+            },
+            {
+              "name": "reply",
+              "value": "={{ $json.choices[0].message.content }}"
+            },
+            {
+              "name": "usage",
+              "value": "={{ $json.usage }}"
+            },
+            {
+              "name": "latency",
+              "value": "={{ Date.now() - $('HTTP Trigger').json.timestamp }}"
+            }
+          ]
+        }
+      },
+      "id": "callback-api",
+      "name": "Callback API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle errors and send fallback response\nconst error = $input.all()[0].json;\n\n// Send fallback callback\nconst fallbackResponse = await fetch($env.API_BASE_URL + '/integrations/n8n/chat/callback', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json'\n  },\n  body: JSON.stringify({\n    sessionId: $('Validate Input').json.sessionId,\n    reply: 'Sorry, I encountered an error. Please try again or contact support.',\n    error: error.message\n  })\n});\n\nreturn {\n  success: fallbackResponse.ok,\n  error: error.message\n};"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 500]
+    }
+  ],
+  "connections": {
+    "HTTP Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat": {
+      "main": [
+        [
+          {
+            "node": "Callback API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}

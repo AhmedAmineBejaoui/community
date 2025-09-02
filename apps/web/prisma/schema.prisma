@@ -1,0 +1,243 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_URI")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String   @unique
+  passwordHash  String
+  fullName      String
+  role          UserRole @default(USER)
+  memberships   Membership[]
+  status        UserStatus @default(PENDING)
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  posts         Post[]
+  comments      Comment[]
+  notifications Notification[]
+  chatSessions  ChatSession[]
+  chatMessages  ChatMessage[]
+  assignedServices Post[] @relation("ServiceAssignee")
+
+  @@map("users")
+}
+
+model Membership {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  communityId String   @db.ObjectId
+  role        Role
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  community   Community @relation(fields: [communityId], references: [id])
+
+  @@map("memberships")
+}
+
+model Community {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  slug       String   @unique
+  description String?
+  joinPolicy JoinPolicy @default(INVITE_ONLY)
+  inviteCode String?  @unique
+  extra      Json?    // Store community settings and features
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  memberships Membership[]
+  posts       Post[]
+  chatSessions ChatSession[]
+
+  // Indexes
+
+  @@map("communities")
+}
+
+model Post {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  communityId String   @db.ObjectId
+  authorId    String   @db.ObjectId
+  type        PostType
+  title       String
+  content     String?
+  images      String[]
+  extra       Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  author      User     @relation(fields: [authorId], references: [id])
+  community   Community @relation(fields: [communityId], references: [id])
+  comments    Comment[]
+  assignee    User?    @relation("ServiceAssignee", fields: [assigneeId], references: [id])
+  assigneeId  String?  @db.ObjectId
+  
+  // Indexes
+  @@index([communityId, type, createdAt(sort: Desc)])
+  @@index([authorId])
+  @@index([assigneeId])
+  @@index([type])
+  @@index([communityId])
+
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  authorId  String   @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  post      Post     @relation(fields: [postId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
+  
+  // Indexes
+  @@index([postId, createdAt])
+  @@index([authorId])
+
+  @@map("comments")
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  
+  // Indexes
+  @@index([userId, read, createdAt])
+
+  @@map("notifications")
+}
+
+model ChatSession {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  communityId     String   @db.ObjectId
+  userId          String?  @db.ObjectId
+  status          ChatSessionStatus @default(ACTIVE)
+  createdAt       DateTime @default(now())
+  lastActivityAt  DateTime @default(now())
+  
+  // Relations
+  community       Community @relation(fields: [communityId], references: [id])
+  user            User?     @relation(fields: [userId], references: [id])
+  messages        ChatMessage[]
+  
+  // Indexes
+  @@index([communityId, status])
+  @@index([userId])
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId   String   @db.ObjectId
+  role        ChatMessageRole
+  content     String
+  tokens      Int?
+  latencyMs   Int?
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  session     ChatSession @relation(fields: [sessionId], references: [id])
+  user        User?       @relation(fields: [userId], references: [id])
+  userId      String?     @db.ObjectId
+  
+  // Indexes
+  @@index([sessionId, createdAt])
+  @@index([role])
+
+  @@map("chat_messages")
+}
+
+// Enums
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum Role { 
+  ADMIN 
+  MODERATOR 
+  RESIDENT 
+}
+
+enum UserStatus { 
+  PENDING 
+  ACTIVE 
+  SUSPENDED 
+}
+
+enum JoinPolicy { 
+  INVITE_ONLY 
+  REQUEST_APPROVAL 
+  CODE 
+}
+
+enum PostType { 
+  ANNOUNCEMENT 
+  SERVICE 
+  LISTING 
+  POLL 
+}
+
+enum NotificationType {
+  POST_CREATED
+  COMMENT_ADDED
+  SERVICE_ASSIGNED
+  POLL_RESULT
+  COMMUNITY_INVITE
+}
+
+enum ChatSessionStatus {
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+enum ChatMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+// Generated by CRUD generator: Task
+model Task {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tasks")
+}
+
+enum TaskStatus {
+  TODO
+  DOING
+  DONE
+}
