@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 interface PollPost {
   id: string;
@@ -90,9 +91,9 @@ export default function PollsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="container-page flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto" />
           <p className="mt-4 text-gray-600">Loading polls...</p>
         </div>
       </div>
@@ -100,115 +101,109 @@ export default function PollsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Community Polls</h1>
-            <p className="mt-2 text-gray-600">Vote on important community decisions</p>
-          </div>
-        </div>
-      </div>
+    <div className="container-page py-8">
+      <PageHeader
+        title="Community Polls"
+        description="Vote on important community decisions"
+      />
 
       {/* Filters */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div>
-              <label htmlFor="community-filter" className="block text-sm font-medium text-gray-700 mb-2">
-                Community
-              </label>
-              <select
-                id="community-filter"
-                value={selectedCommunity}
-                onChange={(e) => setSelectedCommunity(e.target.value)}
-                className="input-field max-w-xs"
-              >
-                <option value="all">All Communities</option>
-                {communities.map((community) => (
-                  <option key={community.id} value={community.id}>
-                    {community.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+      <div className="card mb-8">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div>
+            <label
+              htmlFor="community-filter"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Community
+            </label>
+            <select
+              id="community-filter"
+              value={selectedCommunity}
+              onChange={(e) => setSelectedCommunity(e.target.value)}
+              className="input-field max-w-xs"
+            >
+              <option value="all">All Communities</option>
+              {communities.map((community) => (
+                <option key={community.id} value={community.id}>
+                  {community.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
 
       {/* Polls List */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {polls.length > 0 ? (
-          <div className="space-y-6">
-            {polls.map((poll) => (
-              <div key={poll.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-2xl">📊</span>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPollStatusColor(getPollStatus(poll))}`}>
-                        {getPollStatus(poll)}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      <Link href={`/c/${poll.community.slug}/posts/${poll.id}`} className="hover:text-blue-600">
-                        {poll.title}
-                      </Link>
-                    </h3>
-                    
-                    {poll.content && (
-                      <p className="text-gray-600 mb-4">{poll.content}</p>
-                    )}
-                    
-                    {poll.extra.options && (
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Options:</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {poll.extra.options.map((option, index) => (
-                            <div key={index} className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded">
-                              {option}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center gap-4">
-                        <span>by {poll.author.fullName}</span>
-                        <span>in {poll.community.name}</span>
-                      </div>
-                      <span>{new Date(poll.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    
-                    {poll.extra.totalVotes !== undefined && (
-                      <div className="mt-3 text-sm text-gray-500">
-                        🗳️ {poll.extra.totalVotes} vote{poll.extra.totalVotes !== 1 ? 's' : ''}
-                      </div>
-                    )}
+      {polls.length > 0 ? (
+        <div className="space-y-6">
+          {polls.map((poll) => (
+            <div key={poll.id} className="card">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-2xl">📊</span>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPollStatusColor(getPollStatus(poll))}`}>
+                      {getPollStatus(poll)}
+                    </span>
                   </div>
+
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <Link href={`/c/${poll.community.slug}/posts/${poll.id}`} className="hover:text-primary-600">
+                      {poll.title}
+                    </Link>
+                  </h3>
+
+                  {poll.content && (
+                    <p className="text-gray-600 mb-4">{poll.content}</p>
+                  )}
+
+                  {poll.extra.options && (
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Options:</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {poll.extra.options.map((option, index) => (
+                          <div key={index} className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded">
+                            {option}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center gap-4">
+                      <span>by {poll.author.fullName}</span>
+                      <span>in {poll.community.name}</span>
+                    </div>
+                    <span>{new Date(poll.createdAt).toLocaleDateString()}</span>
+                  </div>
+
+                  {poll.extra.totalVotes !== undefined && (
+                    <div className="mt-3 text-sm text-gray-500">
+                      🗳️ {poll.extra.totalVotes} vote{poll.extra.totalVotes !== 1 ? 's' : ''}
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📊</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No polls found</h3>
-            <p className="text-gray-600 mb-6">
-              {selectedCommunity !== 'all'
-                ? 'No polls have been created in this community yet.'
-                : 'No polls have been created yet.'
-              }
-            </p>
-            <Link href="/" className="btn-primary">
-              Browse Communities
-            </Link>
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">📊</div>
+          <h3 className="text-xl font-medium text-gray-900 mb-2">No polls found</h3>
+          <p className="text-gray-600 mb-6">
+            {selectedCommunity !== 'all'
+              ? 'No polls have been created in this community yet.'
+              : 'No polls have been created yet.'
+            }
+          </p>
+          <Link href="/" className="btn-primary">
+            Browse Communities
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

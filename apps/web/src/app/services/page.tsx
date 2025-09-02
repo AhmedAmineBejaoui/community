@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 interface ServicePost {
   id: string;
@@ -86,9 +87,9 @@ export default function ServicesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="container-page flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto" />
           <p className="mt-4 text-gray-600">Loading services...</p>
         </div>
       </div>
@@ -96,68 +97,66 @@ export default function ServicesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Community Services</h1>
-            <p className="mt-2 text-gray-600">Find and offer services in your neighborhood</p>
-          </div>
-        </div>
-      </div>
+    <div className="container-page py-8">
+      <PageHeader
+        title="Community Services"
+        description="Find and offer services in your neighborhood"
+      />
 
       {/* Filters */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div>
-              <label htmlFor="priority-filter" className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
-              </label>
-              <select
-                id="priority-filter"
-                value={selectedPriority}
-                onChange={(e) => setSelectedPriority(e.target.value)}
-                className="input-field max-w-xs"
-              >
-                <option value="all">All Priorities</option>
-                <option value="URGENT">Urgent</option>
-                <option value="HIGH">High</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="LOW">Low</option>
-              </select>
-            </div>
+      <div className="card mb-8">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div>
+            <label
+              htmlFor="priority-filter"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Priority
+            </label>
+            <select
+              id="priority-filter"
+              value={selectedPriority}
+              onChange={(e) => setSelectedPriority(e.target.value)}
+              className="input-field max-w-xs"
+            >
+              <option value="all">All Priorities</option>
+              <option value="URGENT">Urgent</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+          </div>
 
-            <div>
-              <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                id="status-filter"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="input-field max-w-xs"
-              >
-                <option value="all">All Statuses</option>
-                <option value="OPEN">Open</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="CANCELLED">Cancelled</option>
-              </select>
-            </div>
+          <div>
+            <label
+              htmlFor="status-filter"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Status
+            </label>
+            <select
+              id="status-filter"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="input-field max-w-xs"
+            >
+              <option value="all">All Statuses</option>
+              <option value="OPEN">Open</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
           </div>
         </div>
       </div>
 
       {/* Services List */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {services.length > 0 ? (
-          <div className="space-y-6">
-            {services.map((service) => (
-              <div key={service.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
+      {services.length > 0 ? (
+        <div className="space-y-6">
+          {services.map((service) => (
+            <div key={service.id} className="card">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-2xl">🤝</span>
                       <div className="flex gap-2">

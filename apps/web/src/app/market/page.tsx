@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 interface ListingPost {
   id: string;
@@ -98,9 +99,9 @@ export default function MarketPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="container-page flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto" />
           <p className="mt-4 text-gray-600">Loading marketplace...</p>
         </div>
       </div>
@@ -108,21 +109,15 @@ export default function MarketPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Community Marketplace</h1>
-            <p className="mt-2 text-gray-600">Buy, sell, and trade items with your neighbors</p>
-          </div>
-        </div>
-      </div>
+    <div className="container-page py-8">
+      <PageHeader
+        title="Community Marketplace"
+        description="Buy, sell, and trade items with your neighbors"
+      />
 
       {/* Filters */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="card mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label htmlFor="condition-filter" className="block text-sm font-medium text-gray-700 mb-2">
                 Condition
@@ -189,82 +184,80 @@ export default function MarketPage() {
       </div>
 
       {/* Listings Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {listings.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing) => (
-              <div key={listing.id} className="bg-white rounded-lg shadow overflow-hidden">
-                {/* Image Placeholder */}
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
-                  {listing.images.length > 0 ? (
-                    <img
-                      src={listing.images[0]}
-                      alt={listing.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-4xl">🏷️</span>
+      {listings.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {listings.map((listing) => (
+            <div key={listing.id} className="card overflow-hidden">
+              {/* Image Placeholder */}
+              <div className="h-48 bg-gray-200 flex items-center justify-center">
+                {listing.images.length > 0 ? (
+                  <img
+                    src={listing.images[0]}
+                    alt={listing.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400 text-4xl">🏷️</span>
+                )}
+              </div>
+
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  {listing.extra.condition && (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getConditionColor(listing.extra.condition)}`}>
+                      {listing.extra.condition}
+                    </span>
+                  )}
+                  {listing.extra.availability && (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAvailabilityColor(listing.extra.availability)}`}>
+                      {listing.extra.availability}
+                    </span>
                   )}
                 </div>
 
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    {listing.extra.condition && (
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getConditionColor(listing.extra.condition)}`}>
-                        {listing.extra.condition}
-                      </span>
-                    )}
-                    {listing.extra.availability && (
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAvailabilityColor(listing.extra.availability)}`}>
-                        {listing.extra.availability}
-                      </span>
-                    )}
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <Link href={`/c/${listing.community.slug}/posts/${listing.id}`} className="hover:text-primary-600">
+                    {listing.title}
+                  </Link>
+                </h3>
+
+                {listing.content && (
+                  <p className="text-gray-600 mb-4 line-clamp-2">{listing.content}</p>
+                )}
+
+                {listing.extra.price !== undefined && (
+                  <div className="text-2xl font-bold text-green-600 mb-3">
+                    ${listing.extra.price.toFixed(2)}
                   </div>
+                )}
 
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    <Link href={`/c/${listing.community.slug}/posts/${listing.id}`} className="hover:text-blue-600">
-                      {listing.title}
-                    </Link>
-                  </h3>
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <span>by {listing.author.fullName}</span>
+                  <span>{new Date(listing.createdAt).toLocaleDateString()}</span>
+                </div>
 
-                  {listing.content && (
-                    <p className="text-gray-600 mb-4 line-clamp-2">{listing.content}</p>
-                  )}
-
-                  {listing.extra.price !== undefined && (
-                    <div className="text-2xl font-bold text-green-600 mb-3">
-                      ${listing.extra.price.toFixed(2)}
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>by {listing.author.fullName}</span>
-                    <span>{new Date(listing.createdAt).toLocaleDateString()}</span>
-                  </div>
-
-                  <div className="mt-3 text-sm text-gray-500">
-                    in {listing.community.name}
-                  </div>
+                <div className="mt-3 text-sm text-gray-500">
+                  in {listing.community.name}
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🏷️</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No listings found</h3>
-            <p className="text-gray-600 mb-6">
-              {selectedCondition !== 'all' || selectedAvailability !== 'all' || priceRange.min > 0 || priceRange.max < 1000
-                ? 'Try adjusting your filters'
-                : 'No items have been listed for sale yet.'
-              }
-            </p>
-            <Link href="/" className="btn-primary">
-              Browse Communities
-            </Link>
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🏷️</div>
+          <h3 className="text-xl font-medium text-gray-900 mb-2">No listings found</h3>
+          <p className="text-gray-600 mb-6">
+            {selectedCondition !== 'all' || selectedAvailability !== 'all' || priceRange.min > 0 || priceRange.max < 1000
+              ? 'Try adjusting your filters'
+              : 'No items have been listed for sale yet.'
+            }
+          </p>
+          <Link href="/" className="btn-primary">
+            Browse Communities
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
